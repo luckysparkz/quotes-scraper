@@ -1,3 +1,4 @@
+import asyncio
 import logging
 
 from patchright.async_api import Page
@@ -5,6 +6,7 @@ from patchright.async_api import Page
 from quote import Quote
 
 QUOTE_SELECTOR = ".quote"
+DELAY = 0.5
 
 logger = logging.getLogger(__name__)
 
@@ -40,6 +42,7 @@ async def go_to_next_page(page: Page) -> bool:
         return False
 
     await button.click()
+    await asyncio.sleep(DELAY)
     return True
 
 
