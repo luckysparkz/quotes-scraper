@@ -24,7 +24,13 @@ async def extract_quotes_from_page(page: Page) -> list[Quote]:
 
 
 async def go_to_next_page(page: Page) -> bool:
-    return False
+    button = page.get_by_role("link", name="Next")
+
+    if await button.count() == 0:
+        return False
+
+    await button.click()
+    return True
 
 
 async def scrape_all_quotes(page: Page) -> list[Quote]:
