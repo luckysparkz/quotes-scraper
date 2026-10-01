@@ -1,8 +1,12 @@
+import logging
+
 from patchright.async_api import Page
 
 from quote import Quote
 
 QUOTE_SELECTOR = ".quote"
+
+logger = logging.getLogger(__name__)
 
 
 async def wait_for_quotes(page: Page) -> None:
@@ -34,5 +38,19 @@ async def go_to_next_page(page: Page) -> bool:
 
 
 async def scrape_all_quotes(page: Page) -> list[Quote]:
-    await wait_for_quotes(page)
-    return await extract_quotes_from_page(page)
+    all_quotes = []
+    page_number = 1
+
+    while True:
+        await wait_for_quotes(page)
+        page_quotes = await extract_quotes_from_page(page)
+        all_quotes.extend(page_quotes)
+        logger.info(f"Page {page_number}: found {len(page_quotes)} quotes")
+
+        has_next = await go_to_next_page(page)
+        if not has_next:
+            break
+
+        page_number += 1
+
+    return all_quotes
