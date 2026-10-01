@@ -17,12 +17,18 @@ async def extract_quotes_from_page(page: Page) -> list[Quote]:
     quotes = []
     quote_elements = await page.locator(QUOTE_SELECTOR).all()
 
-    for element in quote_elements:
-        text = await element.locator(".text").inner_text()
-        author = await element.locator(".author").inner_text()
-        tags = await element.locator(".tag").all_inner_texts()
-        quote = Quote(text, author, tags)
-        quotes.append(quote)
+    for index, element in enumerate(quote_elements):
+        try:
+            text = await element.locator(".text").inner_text()
+            author = await element.locator(".author").inner_text()
+            tags = await element.locator(".tag").all_inner_texts()
+        except Exception:
+            logger.warning(
+                f"Skipped quote #{index}: could not extract data", exc_info=True
+            )
+        else:
+            quote = Quote(text, author, tags)
+            quotes.append(quote)
 
     return quotes
 
